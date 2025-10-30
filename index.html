@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mod Gallery — современная web-галерея</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="top-bar">
+        <div class="brand">
+          <span class="brand-mark">Mod</span>
+          <span class="brand-text">Gallery</span>
+        </div>
+        <nav class="nav-actions">
+          <button class="nav-btn is-active" data-target="gallery">Галерея</button>
+          <button class="nav-btn" data-target="admin">Админ-панель</button>
+        </nav>
+      </header>
+
+      <main>
+        <section id="gallerySection" class="view is-active" data-view="gallery">
+          <div class="hero">
+            <h1>Современная web-галерея</h1>
+            <p>
+              Собирайте коллекции, рассказывайте истории и вовлекайте аудиторию с помощью
+              продуманного интерфейса. Категории, комментарии и карточки с подробной
+              информацией — всё под рукой.
+            </p>
+          </div>
+
+          <div class="filters">
+            <div class="chip-list" id="categoryFilters"></div>
+            <div class="search-box">
+              <input
+                type="search"
+                id="searchInput"
+                placeholder="Поиск по названию или описанию"
+              />
+              <span class="material-symbol">search</span>
+            </div>
+          </div>
+
+          <div class="gallery-grid" id="galleryGrid"></div>
+          <div class="empty-state hidden" id="galleryEmpty">
+            <h3>Здесь пока тихо</h3>
+            <p>Добавьте фотографию через админ-панель — и она появится в галерее.</p>
+            <button type="button" class="ghost-btn" data-target="admin">Перейти в админку</button>
+          </div>
+        </section>
+
+        <section id="adminSection" class="view" data-view="admin">
+          <div class="admin-header">
+            <h2>Админ-панель</h2>
+            <p>
+              Управляйте контентом галереи: создавайте категории, загружайте
+              изображения и контролируйте качество за счёт настройки разрешения.
+            </p>
+          </div>
+
+          <div class="admin-grid">
+            <form id="photoForm" class="card form-card">
+              <h3>Новая фотография</h3>
+              <label>
+                Название
+                <input type="text" name="title" placeholder="Например, Рассвет в горах" />
+              </label>
+              <label>
+                Описание
+                <textarea name="description" rows="3" placeholder="История, детали, эмоции"></textarea>
+              </label>
+              <label>
+                Категория
+                <select name="category" id="photoCategorySelect"></select>
+              </label>
+              <label>
+                или добавьте новую категорию
+                <div class="inline-inputs">
+                  <input type="text" id="newCategoryName" placeholder="Название" />
+                  <input type="color" id="newCategoryColor" value="#6c5ce7" />
+                  <button type="button" class="ghost-btn" id="addCategoryBtn">
+                    Добавить
+                  </button>
+                </div>
+              </label>
+
+              <label class="file-drop" id="fileDropZone">
+                <input type="file" accept="image/*" id="photoFile" hidden />
+                <span class="material-symbol">cloud_upload</span>
+                <p>Перетащите изображение или нажмите, чтобы выбрать файл</p>
+                <small>Поддерживаются файлы формата JPG, PNG, WebP до 10 Мб.</small>
+              </label>
+
+              <div class="range-field">
+                <label for="resizeWidth">Максимальная ширина (px)</label>
+                <div class="range-control">
+                  <input
+                    type="range"
+                    id="resizeWidth"
+                    min="480"
+                    max="1920"
+                    step="40"
+                    value="1280"
+                  />
+                  <span id="resizeWidthValue">1280 px</span>
+                </div>
+              </div>
+
+              <div class="preview" id="photoPreview"></div>
+
+              <button type="submit" class="primary-btn">Сохранить фотографию</button>
+            </form>
+
+            <div class="card info-card">
+              <h3>Категории</h3>
+              <div id="categoryList" class="category-list"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal hidden" id="photoModal" aria-hidden="true">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content" role="dialog" aria-modal="true">
+        <button class="modal-close" id="modalCloseBtn" aria-label="Закрыть">×</button>
+        <div class="modal-body">
+          <div class="modal-image-wrapper">
+            <img id="modalImage" alt="" />
+          </div>
+          <div class="modal-info">
+            <div class="modal-meta">
+              <span class="modal-category" id="modalCategory"></span>
+              <span class="modal-date" id="modalDate"></span>
+            </div>
+            <h2 id="modalTitle"></h2>
+            <p id="modalDescription"></p>
+
+            <div class="comments-section">
+              <h3>Комментарии</h3>
+              <div id="commentsList" class="comments-list"></div>
+              <form id="commentForm" class="comment-form">
+                <div class="inline-inputs">
+                  <label class="sr-only" for="commentAuthor">Имя</label>
+                  <input
+                    type="text"
+                    id="commentAuthor"
+                    name="author"
+                    placeholder="Ваше имя"
+                  />
+                  <label class="sr-only" for="commentText">Комментарий</label>
+                  <input
+                    type="text"
+                    id="commentText"
+                    name="text"
+                    placeholder="Напишите что-нибудь..."
+                    required
+                  />
+                  <button type="submit" class="primary-btn">Отправить</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="scripts/main.js"></script>
+  </body>
+</html>
